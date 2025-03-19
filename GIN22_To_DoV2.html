@@ -1,255 +1,752 @@
 <!DOCTYPE html>
+
+ 
+
 <html lang="de">
+ 
+
 <head>
+ 
+
     <meta charset="UTF-8">
+ 
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+
     <title>To-Do Liste</title>
+ 
+
     <style>
+ 
+
         :root {
+ 
+
             --bg-color-light: #f9f9f9;
+ 
+
             --text-color-light: #333;
+ 
+
             --button-color-light: #ddd;
+ 
+
+
+ 
 
             --bg-color-dark: #1a2b3c;
+ 
+
             --text-color-dark: #f1f1f1;
+ 
+
             --button-color-dark: #33475b;
+ 
+
         }
+ 
+
+
+ 
 
         body {
+ 
+
             font-family: Arial, sans-serif;
+ 
+
             margin: 0;
+ 
+
             padding: 0;
+ 
+
             display: flex;
+ 
+
             flex-direction: column;
+ 
+
             align-items: center;
+ 
+
             justify-content: center;
+ 
+
             min-height: 100vh;
+ 
+
             background-color: var(--bg-color-light);
+ 
+
             color: var(--text-color-light);
+ 
+
             transition: background-color 0.3s, color 0.3s;
+ 
+
         }
+ 
+
+
+ 
 
         body.dark {
+ 
+
             background-color: var(--bg-color-dark);
+ 
+
             color: var(--text-color-dark);
+ 
+
         }
+ 
+
+
+ 
 
         .container {
+ 
+
             display: flex;
+ 
+
             flex-direction: column;
+ 
+
             align-items: center;
+ 
+
             width: 90%;
+ 
+
             max-width: 400px;
+ 
+
             padding: 1rem;
+ 
+
             border-radius: 8px;
+ 
+
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+ 
+
             background-color: inherit;
+ 
+
         }
+ 
+
+
+ 
 
         .todo-input {
+ 
+
             width: calc(100% - 10px);
+ 
+
             padding: 0.5rem;
+ 
+
             margin-bottom: 0.5rem;
+ 
+
             border: 1px solid #ccc;
+ 
+
             border-radius: 4px;
+ 
+
             font-size: 1rem;
+ 
+
         }
+ 
+
+
+ 
 
         .button-group {
+ 
+
             display: flex;
+ 
+
             flex-wrap: wrap;
+ 
+
             justify-content: center;
+ 
+
             gap: 5px;
+ 
+
         }
+ 
+
+
+ 
 
         .button {
+ 
+
             padding: 0.5rem 1rem;
+ 
+
             border: none;
+ 
+
             border-radius: 4px;
+ 
+
             cursor: pointer;
+ 
+
             background-color: var(--button-color-light);
+ 
+
             color: inherit;
+ 
+
             font-size: 0.9rem;
+ 
+
         }
+ 
+
+
+ 
 
         .button:hover {
+ 
+
             opacity: 0.8;
+ 
+
         }
+ 
+
+
+ 
 
         body.dark .button {
+ 
+
             background-color: var(--button-color-dark);
+ 
+
         }
+ 
+
+
+ 
 
         .todo-list {
+ 
+
             list-style: none;
+ 
+
             padding: 0;
+ 
+
             width: 100%;
+ 
+
         }
+ 
+
+
+ 
 
         .todo-item {
+ 
+
             display: flex;
+ 
+
             align-items: center;
+ 
+
             justify-content: space-between;
+ 
+
             padding: 0.5rem;
+ 
+
             border-bottom: 1px solid #ccc;
+ 
+
         }
+ 
+
+
+ 
 
         .todo-item.completed {
+ 
+
             text-decoration: line-through;
+ 
+
             color: gray;
+ 
+
         }
+ 
+
+
+ 
 
         .todo-item.overdue {
+ 
+
             color: red;
+ 
+
         }
+ 
+
+
+ 
 
         .hidden {
+ 
+
             display: none;
+ 
+
         }
+ 
+
+
+ 
 
         .date {
+ 
+
             font-size: 0.8rem;
+ 
+
             color: inherit;
+ 
+
         }
+ 
+
+
+ 
 
         .theme-toggle {
+ 
+
             background: none;
+ 
+
             border: none;
+ 
+
             cursor: pointer;
+ 
+
             font-size: 1.5rem;
+ 
+
             color: inherit;
+ 
+
             padding: 0.5rem;
+ 
+
         }
+ 
+
+
+ 
 
         .theme-toggle:hover {
+ 
+
             opacity: 0.8;
+ 
+
         }
+ 
+
     </style>
+ 
+
 </head>
+ 
+
 <body>
+ 
+
     <div class="container">
+ 
+
         <input type="text" id="todoInput" class="todo-input" placeholder="Neuer Eintrag..." maxlength="255">
+ 
+
         <input type="date" id="startDate" class="todo-input">
+ 
+
         <input type="date" id="endDate" class="todo-input">
+ 
+
         
+ 
+
         <div class="button-group">
+ 
+
             <button class="button" onclick="addTodo()">Einfügen</button>
+ 
+
             <button class="button" id="toggleCompleted" onclick="toggleCompletedVisibility()">Beendete Verbergen</button>
+ 
+
             <button class="button" onclick="deleteCompletedTodos()">Beendete Löschen</button>
+ 
+
         </div>
+ 
+
+
+ 
 
         <ul id="todoList" class="todo-list"></ul>
+ 
+
         
+ 
+
         <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌞</button>
+ 
+
     </div>
+ 
+
+
+ 
 
     <script>
+ 
+
         const todoList = document.getElementById('todoList');
+ 
+
         const todoInput = document.getElementById('todoInput');
+ 
+
         const startDateInput = document.getElementById('startDate');
+ 
+
         const endDateInput = document.getElementById('endDate');
+ 
+
         const toggleCompletedButton = document.getElementById('toggleCompleted');
+ 
+
         const themeToggle = document.getElementById('themeToggle');
+ 
+
         let showCompleted = true;
+ 
+
+
+ 
 
         function loadTodos() {
+ 
+
             const todos = JSON.parse(localStorage.getItem('todos')) || [];
+ 
+
             const theme = localStorage.getItem('theme');
+ 
+
             if (theme === 'dark') {
+ 
+
                 document.body.classList.add('dark');
+ 
+
                 themeToggle.textContent = '🌙';
+ 
+
             }
+ 
+
             todos.forEach(todo => renderTodoItem(todo.text, todo.completed, todo.startDate, todo.endDate));
+ 
+
         }
+ 
+
+
+ 
 
         function saveTodos() {
+ 
+
             const todos = Array.from(todoList.children).map(item => ({
+ 
+
                 text: item.querySelector('.todo-text').innerText,
+ 
+
                 completed: item.classList.contains('completed'),
+ 
+
                 startDate: item.dataset.startDate || '',
+ 
+
                 endDate: item.dataset.endDate || ''
+ 
+
             }));
+ 
+
             localStorage.setItem('todos', JSON.stringify(todos));
+ 
+
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+ 
+
         }
+ 
+
+
+ 
 
         function addTodo() {
+ 
+
             const text = todoInput.value.trim();
+ 
+
             const startDate = startDateInput.value;
+ 
+
             const endDate = endDateInput.value;
+ 
+
+
+ 
 
             if (text === '' || text.length > 255) {
+ 
+
                 alert('Bitte eine gültige Aufgabe eingeben (max. 255 Zeichen).');
+ 
+
                 return;
+ 
+
             }
+ 
+
+
+ 
 
             renderTodoItem(text, false, startDate, endDate);
+ 
+
             saveTodos();
+ 
+
             todoInput.value = '';
+ 
+
             startDateInput.value = '';
+ 
+
             endDateInput.value = '';
+ 
+
         }
+ 
+
+
+ 
 
         function renderTodoItem(text, completed, startDate, endDate) {
+ 
+
             const li = document.createElement('li');
+ 
+
             li.className = 'todo-item';
+ 
+
             if (completed) li.classList.add('completed');
+ 
+
+
+ 
 
             const span = document.createElement('span');
+ 
+
             span.className = 'todo-text';
+ 
+
             span.textContent = text;
+ 
+
+
+ 
 
             const dateSpan = document.createElement('span');
+ 
+
             dateSpan.className = 'date';
+ 
+
             dateSpan.textContent = startDate || endDate ? ` (${startDate || 'kein Startdatum'} - ${endDate || 'kein Enddatum'})` : '';
+ 
+
+
+ 
 
             li.dataset.startDate = startDate;
+ 
+
             li.dataset.endDate = endDate;
+ 
+
+
+ 
 
             const checkbox = document.createElement('input');
+ 
+
             checkbox.type = 'checkbox';
+ 
+
             checkbox.checked = completed;
+ 
+
             checkbox.addEventListener('change', () => {
+ 
+
                 li.classList.toggle('completed');
+ 
+
                 saveTodos();
+ 
+
             });
+ 
+
+
+ 
 
             const deleteButton = document.createElement('button');
+ 
+
             deleteButton.textContent = 'Löschen';
+ 
+
             deleteButton.className = 'button';
+ 
+
             deleteButton.addEventListener('click', () => {
+ 
+
                 li.remove();
+ 
+
                 saveTodos();
+ 
+
             });
+ 
+
+
+ 
 
             li.append(checkbox, span, dateSpan, deleteButton);
+ 
+
             todoList.appendChild(li);
+ 
+
         }
+ 
+
+
+ 
 
         function toggleCompletedVisibility() {
+ 
+
             showCompleted = !showCompleted;
+ 
+
             toggleCompletedButton.textContent = showCompleted ? 'Fertige Verbergen' : 'Fertige Einblenden';
+ 
+
             Array.from(todoList.children).forEach(item => item.classList.toggle('hidden', !showCompleted && item.classList.contains('completed')));
+ 
+
         }
+ 
+
+
+ 
 
         function deleteCompletedTodos() {
+ 
+
             Array.from(todoList.children)
+ 
+
                 .filter(item => item.classList.contains('completed'))
+ 
+
                 .forEach(item => item.remove());
+ 
+
             saveTodos();
+ 
+
         }
+ 
+
+
+ 
+
         function toggleTheme() {
-            
-    document.body.classList.toggle('dark');
-    let container = document.querySelector('.container');
-    if (container.classList.contains('dark')) {
-        container.classList.toggle('dark');    
-    }
-    themeToggle.textContent = document.body.classList.contains('dark') ? '🌞' : '🌙';    saveTodos();
-}
+ 
+
+            document.body.classList.toggle('dark');
+ 
+
+            themeToggle.textContent = document.body.classList.contains('dark') ? '🌞' : '🌙';
+ 
+
+            saveTodos();
+ 
+
         }
+ 
+
+
+ 
 
         loadTodos();
+ 
+
     </script>
+ 
+
 </body>
+ 
+
 </html>
